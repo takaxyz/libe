@@ -16,13 +16,13 @@ URL = {
 
 begin
 
-  html_contents = ""
+  schedules = ""
   URL.each do |name, url|
     # ページを取得
     html = URI.open(url).read
     doc = Nokogiri::HTML.parse(html)
 
-    html_contents += name + "\n"
+    schedules += name + "<br>\n"
 
 
     # スケジュールが格納されている要素を特定
@@ -37,7 +37,7 @@ begin
 
     schedule_date.each_with_index do |item, i|
 
-      html_contents += sprintf("%s %s %s\n", item.text, schedule_stb[i].text, schedule_desc[i].text.gsub(/[\r\n]/,""))
+    schedules += sprintf("%s　%s　%s<br>\n", item.text, schedule_stb[i].text, schedule_desc[i].text.gsub(/[\r\n]/,""))
     end
 
 
@@ -46,12 +46,23 @@ begin
       puts "詳細なスケジュール要素が見つかりませんでした。サイトの構造が変更された可能性があります。"
     end
 
-    html_contents += "\n"
+    schedules += "<br>\n"
   end
 
-  puts html_contents
+  puts schedules
 
-  File.write('index.html', html_contents)
+  html_content = <<~HTML
+  <!DOCTYPE html>
+  <html>
+  <head><meta charset="utf-8"><title>Update Report</title></head>
+  <body>
+    <h3>サイト更新情報</h3>
+    #{schedules}
+  </body>
+  </html>
+  HTML
+  
+  File.write('index.html', html_content)
 
 rescue OpenURI::HTTPError => e
   puts "サイトにアクセスできませんでした: #{e.message}"
