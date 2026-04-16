@@ -1,8 +1,11 @@
 require 'nokogiri'
 require 'open-uri'
+require 'time'
 require 'json'
 
 # 対象のURL
+
+ENV['TZ'] = 'Asia/Tokyo'
 
 URL = {
   "ゆうり" => "https://libe-shinjuku.com/profile-yuuriyokohama.html",
@@ -13,6 +16,7 @@ URL = {
   "綾瀬える" => "https://libe-shinjuku.com/profile-ayase.html"
 }
 
+now_jst = Time.new(in: "+09:00")
 
 begin
 
@@ -57,6 +61,7 @@ begin
   <head><meta charset="utf-8"><title>Update Report</title></head>
   <body>
     <h3>サイト更新情報</h3>
+    <p>#{now_jst.strftime("%Y-%m-%d %H:%M:%S")}</p>
     #{schedules}
   </body>
   </html>
