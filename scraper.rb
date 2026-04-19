@@ -1,48 +1,47 @@
 require 'nokogiri'
 require 'open-uri'
 require 'time'
+require 'yaml'
 require 'json'
 
 # 対象のURL
+urls = open('urls.yml', 'r') { |f| YAML.load(f) }
 
 ENV['TZ'] = 'Asia/Tokyo'
-
-URL = {
-  "ゆうり" => "https://libe-shinjuku.com/profile-yuuriyokohama.html",
-  "ななみ" => "https://libe-tokyo.com/profile-nanami.html",
-  "水瀬ななこ" => "https://libe-tokyo.com/profile-nanako.html",
-  "有村あいり" => "https://libe-tokyo.com/profile-airi.html",
-  "茜さつき" => "https://libe-shinjuku.com/profile-satsuki.html",
-  "綾瀬える" => "https://libe-shinjuku.com/profile-ayase.html"
-}
 
 now_jst = Time.new(in: "+09:00")
 
 begin
 
   schedules = ""
-  URL.each do |name, url|
+  urls['url'].each do |url|
     # ページを取得
-    html = URI.open(url).read
+    html = URI.open("https://libe-shinjuku.com/" + url).read
     doc = Nokogiri::HTML.parse(html)
 
-    schedules += name + "<br>\n"
+    next if doc.css('dd.profile').length == 0
 
+    name = doc.css('dd.profile')[0].text[3..-1]
+
+    puts name
+
+    sch = name + "<br>\n"
 
     # スケジュールが格納されている要素を特定
     # サイト構成に基づき、スケジュールリストを取得（class名などはサイト仕様に合わせる必要があります）
     # 多くの場合、'schedule_list' や 'table' 内にデータがあります
 
-    sch = Array.new;
-
     schedule_date = doc.css('.prof-sched-date')
     schedule_stb = doc.css('.prof-sched-stb')
     schedule_desc = doc.css('.prof-sched-desc')
 
+
     schedule_date.each_with_index do |item, i|
 
-    schedules += sprintf("%s　%s　%s<br>\n", item.text, schedule_stb[i].text, schedule_desc[i].text.gsub(/[\r\n]/,""))
+      sch += sprintf("%s　%s　%s<br>\n", item.text, schedule_stb[i].text, schedule_desc[i].text.gsub(/[\r\n]/,""))
+
     end
+
 
 
     # 特定の構造（カレンダー形式など）に対応するための汎用的な抽出
@@ -50,10 +49,14 @@ begin
       puts "詳細なスケジュール要素が見つかりませんでした。サイトの構造が変更された可能性があります。"
     end
 
-    schedules += "<br>\n"
+    if sch.include?("待機") or sch.include?("出勤")
+      schedules += sch + "<br>\n"
+    else
+      schedules += name + "　なし<br><br>\n"
+    end
   end
 
-  puts schedules
+  #puts schedules
 
   html_content = <<~HTML
   <!DOCTYPE html>
