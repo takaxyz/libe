@@ -25,7 +25,7 @@ begin
 
     puts name
 
-    sch = name + "<br>\n"
+    sch = "<a href=\"https://libe-shinjuku.com/" + url + "\" target=\"_blank\">" + name + "</a><br>\n"
 
     # スケジュールが格納されている要素を特定
     # サイト構成に基づき、スケジュールリストを取得（class名などはサイト仕様に合わせる必要があります）
