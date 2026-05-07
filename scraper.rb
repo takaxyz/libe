@@ -52,7 +52,7 @@ begin
     if sch.include?("待機") or sch.include?("出勤")
       schedules += sch + "<br>\n"
     else
-      schedules += name + "　なし<br><br>\n"
+      schedules += "<a href=\"https://libe-shinjuku.com/" + url + "\" target=\"_blank\">" + name + "</a><br>\n" + "　なし<br><br>\n"
     end
   end
 
@@ -61,7 +61,7 @@ begin
   html_content = <<~HTML
   <!DOCTYPE html>
   <html>
-  <head><meta charset="utf-8"><title>Update Report</title></head>
+  <head><meta charset="utf-8"><title>Schedule</title></head>
   <body>
     <h3>サイト更新情報</h3>
     <p>#{now_jst.strftime("%Y-%m-%d %H:%M:%S")}</p>
