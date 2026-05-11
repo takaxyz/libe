@@ -2,7 +2,7 @@ name: Ruby Scraper and Deploy
 
 on:
   schedule:
-    - cron: '15 23,0-12 * * *'
+    - cron: '15 1-12 * * *'
   workflow_dispatch:
 
 permissions:
